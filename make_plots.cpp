@@ -1,6 +1,6 @@
-// make_plots.cpp - будує всі рисунки з CSV-файлів, створених experiments.cpp (SVG, чистий C++).
-// Збірка:  g++ -O2 -std=c++17 make_plots.cpp -o make_plots
-// Запуск:  ./make_plots <каталог_з_CSV> <каталог_для_SVG>
+// make_plots.cpp - будує всі рисунки з CSV-файлів, створених experiments.cpp 
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include "svgplot.hpp"
 
 #include <cmath>

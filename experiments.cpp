@@ -1,7 +1,4 @@
-// experiments.cpp - серія експериментів для лабораторної роботи №5, варіант №34.
-// Збірка:  g++ -O2 -std=c++17 experiments.cpp -o experiments
-// Запуск:  ./experiments <каталог_для_CSV>
-// Усі числа в тезах беруться з файлів, які створює ця програма.
+// experiments.cpp - серія експериментів для лабораторної роботи 
 #include "physics.hpp"
 
 #include <algorithm>
@@ -11,6 +8,7 @@
 #include <cstdlib>
 #include <string>
 #include <vector>
+#include <atomic>
 
 using namespace phys;
 
@@ -36,19 +34,27 @@ struct Run {
 // Кожен вимір = `inner` повторів, щоб тривалість значно перевищувала розрізнення годинника;
 // `repeats` вимірів -> середнє та стандартне відхилення часу ОДНОГО прогону.
 static void timeMethod(Method mth, const Params& p, double dt, long n, int repeats,
-                       double& mean, double& sd) {
+    double& mean, double& sd) {
     const long inner = std::max(1L, 4000000L / n);
     auto once = [&]() {
         double acc = 0;
         for (long r = 0; r < inner; ++r) {
             Params q = p;
             double d = dt;
+
+            // Кросплатформний бар'єр оптимізації (працює і в MSVC, і в GCC/Clang)
+#if defined(_MSC_VER)
+            std::atomic_signal_fence(std::memory_order_acq_rel);
+            (void)q.x0; (void)d;
+#else
             asm volatile("" : "+m"(q.x0), "+m"(d));   // бар'єр: заборона виносу обчислень з циклу
+#endif
+
             const State s = integrate(mth, q, d, n, [](long, const State&) {});
             acc += s.x;
         }
         g_sink = g_sink + acc;
-    };
+        };
     once();   // прогрів
     std::vector<double> ts;
     for (int i = 0; i < repeats; ++i) {

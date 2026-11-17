@@ -20,3 +20,6 @@ if(BUILD_SFML_DEMO)
   add_executable(SFML_Lab main.cpp)
   target_link_libraries(SFML_Lab PRIVATE SFML::Graphics SFML::Window SFML::System)
 endif()
+
+# Автоматичне копіювання папки ресурсів у каталог з виконуваним файлом
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/resources DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
